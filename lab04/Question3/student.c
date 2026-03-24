@@ -58,4 +58,23 @@ struct TreeNode {
 
 int sumNumbers(struct TreeNode* root) {
       // TODO: implement
+        if (root == NULL) 
+                return 0;
+        
+        if (root->left == NULL && root->right == NULL) {
+                return root->val;
+        }
+
+        int total = 0;
+        
+        if (root->left) {
+                root->left->val = root->val * 10 + root->left->val;
+                total += sumNumbers(root->left);
+        }
+        
+        if (root->right) {
+                root->right->val = root->val * 10 + root->right->val;
+                total += sumNumbers(root->right);
+        }
+        return total;
 }
