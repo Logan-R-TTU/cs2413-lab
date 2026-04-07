@@ -64,17 +64,37 @@ whose sum equals target.
 */
 int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
     /* Write your code here */
-
+Node* table[TABLE_SIZE] = {NULL};
+    
+    int* result = (int*)malloc(2 * sizeof(int));
     *returnSize = 0;
-    return NULL;
+
+    for (int i = 0; i < numsSize; i++) {
+        int complement = target - nums[i];
+        int complementIndex;
+        
+        if (find(table, complement, &complementIndex)) {
+            result[0] = complementIndex;
+            result[1] = i;
+            *returnSize = 2;
+            
+            freeTable(table);
+            return result;
+        }
+        insert(table, nums[i], i);
+    }
+
+    // Per problem constraints, a solution always exists, but good practice:
+    freeTable(table);
+    return result;
 }
 
 /*
 Optional helper: compute a hash index for a key.
 */
 static int hash(int key) {
-    /* Write your code here if you use this helper */
-    return 0;
+    int h = key % TABLE_SIZE;
+    return (h < 0) ? (h + TABLE_SIZE) : h;
 }
 
 /*
@@ -82,6 +102,12 @@ Optional helper: insert (key, value) into the hash table.
 */
 static void insert(Node* table[], int key, int value) {
     /* Write your code here if you use this helper */
+    int h = hash(key);
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->key = key;
+    newNode->value = value;
+    newNode->next = table[h];
+    table[h] = newNode;
 }
 
 /*
@@ -90,7 +116,15 @@ If found, store the associated value in *value and return 1.
 Otherwise return 0.
 */
 static int find(Node* table[], int key, int* value) {
-    /* Write your code here if you use this helper */
+    int h = hash(key);
+    Node* curr = table[h];
+    while (curr) {
+        if (curr->key == key) {
+            *value = curr->value;
+            return 1;
+        }
+        curr = curr->next;
+    }
     return 0;
 }
 
@@ -99,4 +133,12 @@ Optional helper: free all memory used by the hash table.
 */
 static void freeTable(Node* table[]) {
     /* Write your code here if you use this helper */
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        Node* curr = table[i];
+        while (curr) {
+            Node* temp = curr;
+            curr = curr->next;
+            free(temp);
+        }
+    }
 }
